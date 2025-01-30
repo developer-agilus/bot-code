@@ -1,0 +1,50 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.11",
+    "version": "1.0.0",
+    "id": "ad1e8f7b-77df-4c8b-a182-4102191677c2",
+    "packageName": "com.agilus.searchbot",
+    "name": {
+        "short": "DQ360",
+        "full": "DQ360-Bot"
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#FFFFFF",
+    "developer": {
+      "name": "Developer",
+      "websiteUrl": "https://yourwebsite.com",
+      "privacyUrl": "https://yourwebsite.com/privacy",
+      "termsOfUseUrl": "https://yourwebsite.com/terms"
+    },
+    "description": {
+      "full": "A messaging extension that searches for items in an Azure SQL Database.",
+      "short": "Search extension"
+    },
+    "composeExtensions": [
+      {
+        "botId": "cd54b88b-7742-4475-9ffc-12a5fa575e8b",
+        "commands": [
+          {
+            "id": "searchCommand",
+            "type": "query",
+            "title": "Search Database",
+            "description": "Search for data in Azure SQL Database",
+            "parameters": [
+              {
+                "name": "query",
+                "title": "Search Query",
+                "description": "Enter a search term",
+                "inputType": "text"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "permissions": ["identity", "messageTeamMembers"],
+    "validDomains": ["https://myteamsbot-ajg2etffdqf5bwe5.southafricanorth-01.azurewebsites.net/"]
+  }
+  

@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "botbuilder": "^4.23.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mssql": "^11.0.1",
+    "restify": "^11.1.0"
+  }
+}
