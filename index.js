@@ -1,67 +1,36 @@
-const { TeamsActivityHandler, CardFactory } = require("botbuilder");
-const sql = require("mssql");
+const { TeamsActivityHandler, CardFactory, MessageFactory } = require("botbuilder");
 const restify = require("restify");
 
-// Azure SQL Database Configuration
-const dbConfig = {
-    user: "AgilusDevuser",
-    password: "Procurement2022!",
-    server: "tcp:agilusportaldev.database.windows.net,1433",
-    database: "Agilus_Master",
-    options: {
-        encrypt: true,
-        enableArithAbort: true
-    }
-};
-
-// Create Bot Server
+// Create bot server
 const server = restify.createServer();
-server.use(restify.plugins.bodyParser()); // <-- Ensure body is parsed
-server.listen(process.env.port || process.env.PORT || 3978, function () {
-    console.log(`\nBot Started, Listening on ${server.url}`);
+server.use(restify.plugins.bodyParser());
+
+server.listen(process.env.PORT || 3978, () => {
+    console.log(`\nBot is running on port ${process.env.PORT || 3978}`);
 });
 
 // Define Bot Class
-class SearchBot extends TeamsActivityHandler {
-    async handleTeamsMessagingExtensionQuery(context, query) {
-        const searchText = query.parameters[0].value;
+class TeamsBot extends TeamsActivityHandler {
+    constructor() {
+        super();
+        
+        // Handle incoming messages from Teams
+        this.onMessage(async (context, next) => {
+            console.log("Received Message from Teams: ", context.activity.text);
+            await context.sendActivity(MessageFactory.text(`You said: ${context.activity.text}`));
+            await next();
+        });
 
-        try {
-            // Connect to Azure SQL and fetch results
-            await sql.connect(dbConfig);
-            const result = await sql.query`SELECT Title, Description FROM Items WHERE Title LIKE '%' + ${searchText} + '%'`;
-
-            // Format results as a list
-            const attachments = result.recordset.map(item =>
-                CardFactory.thumbnailCard(item.Title, item.Description)
-            );
-
-            return {
-                composeExtension: {
-                    type: "result",
-                    attachmentLayout: "list",
-                    attachments
-                }
-            };
-        } catch (err) {
-            console.error("Database Error: ", err);
-            return {
-                composeExtension: {
-                    type: "message",
-                    text: "Error fetching data. Please try again."
-                }
-            };
-        } finally {
-            sql.close();
-        }
+        // Handle Teams conversation update (e.g., when bot is added)
+        this.onConversationUpdate(async (context, next) => {
+            console.log("Bot added to Teams chat.");
+            await next();
+        });
     }
 }
 
-// Create and Register Bot
-const bot = new SearchBot();
-
-// Handle incoming messages
+// Create bot instance
+const bot = new TeamsBot();
 server.post("/api/messages", async (req, res) => {
-    console.log("Received Request:", req.body);  // <-- Log incoming request
-    res.send({ text: "Bot received your message!", received: req.body.text }); // <-- Return proper response
+    await bot.run(req, res);
 });
